@@ -55,14 +55,14 @@ HADES-D<br>
 	<dd>>ver 2.2.4</dd>
 	<dd>衛星を新たに選択した時、画面・ファイルを初期化するよう変更</dd>
 	<dt>2024-07-05</dt>
-	<dd></dd>ver 2.2.3</dl>
+	<dd><ver 2.2.3</dd>
  	<dd>フィルタ無しのテスト用衛星[ZZ/ TEST /ZZ]を選択できるようにした。<br>（転送はせずファイル出力をチェックするように使用してください。）</dd>
 	<dt>2024-07-03</dt>
  	<dd>ver 2.2.2</dd>
-  	<dd>TLEリストをダイアログで選択できるようにした。<br>daily-bulletin.txtについては直接WEB指定でもローカルファイルの<br>指定でもOK。また homemade.txtという自作ローカルファイルも指定<br>可(サンプル添付)
+  	<dd>TLEリストをダイアログで選択できるようにした。<br>daily-bulletin.txtについては直接WEB指定でもローカルファイルの<br>指定でもOK。また homemade.txtという自作ローカルファイルも指定<br>可(サンプル添付)</dd>
 	<dt>2024-06-29</dt>
  	<dd>ver 2.2.1	ローカルフォルダ（例：Documents）にhomemade.txtの名前で作った<br>TLEリストからサテライトリストを作成出来るようにした<br>
-		iclude DLL	IO-117(53106), LEDSAT(49069), KASHIWA(59508), CubeBel-2(57175),	GRBAlpha(47959)</dd>
+		include DLL	IO-117(53106), LEDSAT(49069), KASHIWA(59508), CubeBel-2(57175),	GRBAlpha(47959)</dd>
 	<dt>2024-06-26</dt>
  	<dd>ver 2.2.0</dd>
   	<dd>Pythonの仮想環境を又は実環境を必要としない、コンパイルされた<br>post_request.exeを使用したモデルに変更</dd>
