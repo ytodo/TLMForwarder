@@ -1,6 +1,6 @@
 # TLMForwarder
 
-// DLL files are added for each Satellite.
+// DLL files are added for each Satellite.<br>
 #############<br>
  Attached DLL List<br>
 #############<br>
@@ -12,7 +12,7 @@
 47959.dll	GRBAlpha<br>
 58567.dll	HADES-D		(SO-121)<br>
 
-// Sample of NEW Satellite's TLE file which is Wrote yourself as handmade.txt.
+// Sample of NEW Satellite's TLE file which is Wrote yourself as handmade.txt.<br>
 ####################<br>
 Handmade TLE List<br>
 <br>
