@@ -52,7 +52,7 @@ HADES-D<br>
 	<dd width="20%">ver 2.3.0</dd>
 	<dd width="60%">Visual Studio Codeでソース変更（機能変更無し）。<br>.NET runtimeと分離した。（インストールを促すメッセージを表示。)</dd>
 	<dt>2024-07-07</dt>
-	<dd>>ver 2.2.4</dd>
+	<dd>ver 2.2.4</dd>
 	<dd>衛星を新たに選択した時、画面・ファイルを初期化するよう変更</dd>
 	<dt>2024-07-05</dt>
 	<dd>ver 2.2.3</dd>
