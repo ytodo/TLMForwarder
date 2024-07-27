@@ -1,5 +1,6 @@
 # TLMForwarder
 
+// DLL files are added for each Satellite.
 #############<br>
  Attached DLL List<br>
 #############<br>
@@ -11,6 +12,7 @@
 47959.dll	GRBAlpha<br>
 58567.dll	HADES-D		(SO-121)<br>
 
+// Sample of NEW Satellite's TLE file which is Wrote yourself as handmade.txt.
 ####################<br>
 Handmade TLE List<br>
 <br>
@@ -43,3 +45,28 @@ HADES-D<br>
 1 58567U 23174CY  24183.17961421  .00058899  00000-0  19343-2 0  9998<br>
 2 58567  97.4543 258.9627 0013472 177.0274 183.1050 15.31276393 35926<br>
 /EX
+
+// バージョンアップと変更点 ( Release Note )
+<dl>
+<dt>2024-07-24</dt><dd> ver 2.3.0</dd><dd></dd>	Visual Studio Codeでソース変更（機能変更無し）。</dd>
+						.NET runtimeと分離した。（インストールを促すメッセージを表示。
+
+2024-07-07	ver 2.2.4	衛星を新たに選択した時、画面・ファイルを初期化するよう変更
+
+2024-07-05 	ver 2.2.3	フィルタ無しのテスト用衛星[ZZ/ TEST /ZZ]を選択できるようにした。
+						（転送はせずファイル出力をチェックするように使用してください。）
+
+2024-07-03	ver 2.2.2	TLEリストをダイアログで選択できるようにした。
+						daily-bulletin.txtについては直接WEB指定でもローカルファイルの
+						指定でもOK。また homemade.txtという自作ローカルファイルも指定
+						可(サンプル添付)
+
+2024-06-29　ver 2.2.1	ローカルフォルダ（例：Documents）にhomemade.txtの名前で作った
+						TLEリストからサテライトリストを作成出来るようにした
+			iclude DLL	IO-117(53106), LEDSAT(49069), KASHIWA(59508), CubeBel-2(57175)
+						GRBAlpha(47959)
+
+2024-06-26	ver 2.2.0	Pythonの仮想環境を又は実環境を必要としない、コンパイルされた
+			post_request.exeを使用したモデルに変更
+</dl>
+
