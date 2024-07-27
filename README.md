@@ -47,7 +47,7 @@ HADES-D<br>
 /EX
 
 // バージョンアップと変更点 ( Release Note )<br>
-<span style="width:20%;">2024-07-24</span><span style="width:20%;">ver 2.3.0</span><span style="width:60%;">Visual Studio Codeでソース変更（機能変更無し）。<br>.NET runtimeと分離した。（インストールを促すメッセージを表示。)</span>
+<span style="width:200px;">2024-07-24</span><span style="width:200px;">ver 2.3.0</span><span style="width:060px;">Visual Studio Codeでソース変更（機能変更無し）。<br>.NET runtimeと分離した。（インストールを促すメッセージを表示。)</span>
 
 2024-07-07	ver 2.2.4	衛星を新たに選択した時、画面・ファイルを初期化するよう変更
 
