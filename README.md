@@ -49,25 +49,22 @@ HADES-D<br>
 // バージョンアップと変更点 ( Release Note )<br>
 <dl width="90%">
 	<dt width="20%">2024-07-24</dt>
-	<dt width="20%">ver 2.3.0</dt>
+	<dd width="20%">ver 2.3.0</dd>
 	<dd width="60%">Visual Studio Codeでソース変更（機能変更無し）。<br>.NET runtimeと分離した。（インストールを促すメッセージを表示。)</dd>
-</dl>
-2024-07-07	ver 2.2.4	衛星を新たに選択した時、画面・ファイルを初期化するよう変更
-
-2024-07-05 	ver 2.2.3	フィルタ無しのテスト用衛星[ZZ/ TEST /ZZ]を選択できるようにした。
-						（転送はせずファイル出力をチェックするように使用してください。）
-
-2024-07-03	ver 2.2.2	TLEリストをダイアログで選択できるようにした。
-						daily-bulletin.txtについては直接WEB指定でもローカルファイルの
-						指定でもOK。また homemade.txtという自作ローカルファイルも指定
-						可(サンプル添付)
-
-2024-06-29　ver 2.2.1	ローカルフォルダ（例：Documents）にhomemade.txtの名前で作った
-						TLEリストからサテライトリストを作成出来るようにした
-			iclude DLL	IO-117(53106), LEDSAT(49069), KASHIWA(59508), CubeBel-2(57175)
-						GRBAlpha(47959)
-
-2024-06-26	ver 2.2.0	Pythonの仮想環境を又は実環境を必要としない、コンパイルされた
-			post_request.exeを使用したモデルに変更
+	<dt>2024-07-07</dt>
+	<dd>>ver 2.2.4</dd>
+	<dd>衛星を新たに選択した時、画面・ファイルを初期化するよう変更</dd>
+	<dt>2024-07-05</dt>
+	<dd></dd>ver 2.2.3</dl>
+ 	<dd>フィルタ無しのテスト用衛星[ZZ/ TEST /ZZ]を選択できるようにした。<br>（転送はせずファイル出力をチェックするように使用してください。）</dd>
+	<dt>2024-07-03</dt>
+ 	<dd>ver 2.2.2</dd>
+  	<dd>TLEリストをダイアログで選択できるようにした。<br>daily-bulletin.txtについては直接WEB指定でもローカルファイルの<br>指定でもOK。また homemade.txtという自作ローカルファイルも指定<br>可(サンプル添付)
+	<dt>2024-06-29</dt>
+ 	<dd>ver 2.2.1	ローカルフォルダ（例：Documents）にhomemade.txtの名前で作った<br>TLEリストからサテライトリストを作成出来るようにした<br>
+		iclude DLL	IO-117(53106), LEDSAT(49069), KASHIWA(59508), CubeBel-2(57175),	GRBAlpha(47959)</dd>
+	<dt>2024-06-26</dt>
+ 	<dd>ver 2.2.0</dd>
+  	<dd>Pythonの仮想環境を又は実環境を必要としない、コンパイルされた<br>post_request.exeを使用したモデルに変更</dd>
 </dl>
 
