@@ -1,4 +1,9 @@
 # TLMForwarder
+<LICENSE><br>
+著作権は私、藤堂善春(JE3HCZ)に属しています。ただし、クレジットを継承し、商用には供せず、<BR>
+変更箇所についても同様のライセンス形態を継承する限り自由に改変、配布することが可能です。<br>
+CC BY-NC-SA&nbsp;&nbsp;&nbsp;
+<a href="https://creativecommons.org/share-your-work/cclicenses/" target="_blank">ABOUT CC LICENSES</a>
 
 //-------------------------------------------------------------------------------<br>
 // DLL files are added for each Satellite.<br>
