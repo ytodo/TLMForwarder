@@ -6,6 +6,7 @@ using System.Data;
 using System.Runtime.InteropServices;
 using System.Timers;
 using Serilog;
+using System.CodeDom.Compiler;
 
 namespace TLMForwarder;
 
@@ -17,20 +18,20 @@ public partial class FrmMain : Form
 	
 	// 設定ファイルのパスをreadonlyで指定（readonlyだとそれぞれのフォームで指定要）
 	public readonly string confPath = @".\config\TLMForwarder.ini";	// 設定用ファイル
-	private readonly string version = "2.3.0";							// バージョン
-	public readonly FrmSettings frmSettings = new();					// FrmSettingsのインスタンス
-	private readonly List<string[]> sat_list = [];						// 文字配列リストとしてsat_listを作成
-	public static object? classInstance;								// DLLのクラスインスタンス
-	public Type? classType;												// DLLのクラスタイプ
-	public bool clientStop = false;										// tcpclientに対するstop flag
-	private byte[]? recvData;											// 受信データのメインスレッド側受け皿
-	private string? tlmPath;												// ログファイルのパス
-	private string? digPath;												// ログファイルのパス
-	private string? kssPath;												// ログファイルのパス
-	private string? hexPath;												// ログファイルのパス
-	public readonly byte[]? tmpBuff;									// SubThreadからMainThreadへの受け渡しデータ
-	public int forwardNum = 0;											// 転送(送信)した回数
-	public int apliedNum = 0;											// 受け付けられたテレメトリー数
+	private readonly string version = "2.3.1";						// バージョン
+	public readonly FrmSettings frmSettings = new();				// FrmSettingsのインスタンス
+	private List<string[]>? sat_list = [];					// 文字配列リストとしてsat_listを作成
+	public static object? classInstance;							// DLLのクラスインスタンス
+	public Type? classType;											// DLLのクラスタイプ
+	public bool clientStop = false;									// tcpclientに対するstop flag
+	private byte[]? recvData;										// 受信データのメインスレッド側受け皿
+	private string? tlmPath;										// ログファイルのパス
+	private string? digPath;										// ログファイルのパス
+	private string? kssPath;										// ログファイルのパス
+	private string? hexPath;										// ログファイルのパス
+	public readonly byte[]? tmpBuff;								// SubThreadからMainThreadへの受け渡しデータ
+	public int forwardNum = 0;										// 転送(送信)した回数
+	public int apliedNum = 0;										// 受け付けられたテレメトリー数
 	private static System.Timers.Timer? aTimer;
 	private static FrmMain? instance;
 	private TcpClient? client;
@@ -69,7 +70,7 @@ public partial class FrmMain : Form
 	///********************************************
 	private void FrmMain_Load(object sender, EventArgs e)
 	{
-		// FormのTitleを”TLMForwarder"とする
+		// FormのTitleを”TLMForwarder"とし、バージョンを標記
 		Text = Application.ProductName + " v." + version;
 
 		// メニューバーに表示するDate/Timeのクロック
@@ -82,7 +83,7 @@ public partial class FrmMain : Form
 		tabControl.SelectedIndexChanged += TabControl_SelectedIndexChanged!;    // !はnull許容参照型として扱う
 
 		// 設定ファイルよりデータを読みSettingsフォームに表示する関数呼び出し
-		ReadSettingsFromfile();
+		frmSettings.ReadSettingsFromfile();
 
 		// Formの起動位置を指定
 		if (frmSettings.TxtWindow_x.Text != "" && frmSettings.TxtWindow_y.Text != "")
@@ -93,7 +94,7 @@ public partial class FrmMain : Form
 		}
 
 		// TLEファイルからコンボボックス用衛星リストを作成し表示する
-		TLE2SatnameList();
+		SatnameList();
 
 		// データベース選択コンボボックスのItem表示
 		CmbDatabase.Items.AddRange([
@@ -299,81 +300,6 @@ public partial class FrmMain : Form
 	}
 
 	//************************************************************
-	//	TLMForwarder.iniから設定を読みFrmSettingsの各項目に代入する
-	//************************************************************
-
-	public void ReadSettingsFromfile()
-	{
-		// ファイルが存在するか確認
-		if (File.Exists(confPath))
-		{
-			// ファイルからすべての行を読み込む
-			string[] lines = File.ReadAllLines(confPath);               // 設定ファイルからの行データを取得
-
-			// 各行を処理する
-			foreach (string line in lines)
-			{
-				// セパレータ'='で分割
-				string[] parts = line.Split('=');
-
-				if (parts.Length == 2)
-				{
-					// 項目名をテキストボックス名として取得
-					string textBoxName = "Txt" + parts[0].Trim();
-					string textBoxText = parts[1].Trim();
-
-
-					// 対応するテキストボックスに設定値を代入
-					if (frmSettings.Controls.ContainsKey(textBoxName))
-					{
-						TextBox? textBox = frmSettings.Controls[textBoxName] as TextBox;
-
-						if (textBox != null)
-						{
-							try
-							{
-								// 他のフォームのため Invoke が必要か判断
-								if (frmSettings.InvokeRequired)
-								{
-									frmSettings.Invoke((System.Windows.Forms.MethodInvoker)delegate
-									{
-										textBox.Text = textBoxText;
-									});
-								}
-								else
-								{	// Invokeが不要な場合
-									textBox.Text = textBoxText;
-								}
-							}
-							catch (Exception ex)
-							{
-								Log.Warning($"Error setting text for {textBoxName}: {ex.Message}");
-							}
-						}
-						else
-						{
-							Log.Warning ($"{textBoxName} is not a TextBox.");
-						}
-					}
-					else
-					{
-						Log.Warning($"{textBoxName} does not exist in frmSettings.Controls.");
-        		
-					}
-				}
-			}
-			Log.Information("TLMForwarder.ini has been successfully read.");
-		}
-		else
-		{
-			/* ファイルが存在しない場合の処理 */
-			MessageBox.Show("TLMForwarder.ini must be in CURRENT Dir.\n" +
-							"Current DIR is now " + Directory.GetCurrentDirectory());
-			Log.Warning("No file named TLMForwarder.ini.");
-		}
-	}
-
-	//************************************************************
 	//	設定パネルを表示(データはメインフォーム立ち上げ時に代入済み 
 	//************************************************************
 	private void BtnSettings_Click(object sender, EventArgs e)
@@ -384,131 +310,38 @@ public partial class FrmMain : Form
 	//************************************************************
 	//	ダウンロードしたTLEファイルから satname:noradID リストを作る 
 	//************************************************************
-	private void TLE2SatnameList()
+	private void SatnameList()
 	{
 		// 設定ファイルからURLを読み、TLE.txt名でダウンロード
 		string tleURL = frmSettings.TxtTLE_Source.Text;
-		string fileName = @"TLE.txt";
 
-		Debug.WriteLine(tleURL);
+		// クラス名とメソッド名で他ファイルの処理を呼び出す。（元データの作成）
+		var results = SatNameList.TLE2SatnameList(tleURL);
+		sat_list = results.sat_list;
+		LblAlarm.Text = results.text;
+		LblAlarm.ForeColor = results.color;
 
-		if (tleURL == "") return;
-		if (tleURL != "http://www.amsat.org/tle/current/daily-bulletin.txt"
-			&& tleURL[..2] != "C:" 
-			&& tleURL[..2] != "c:")
+		if (sat_list != null)
 		{
-			// TLEの処理が出来ない場合のメッセージ
-			LblAlarm.Text = "Change URL \"daily-bulletin.txt\" or \"Local handmade.txt\"";
-			LblAlarm.ForeColor = Color.Red;
-			Log.Warning(tleURL + " could not use.");
-			return;
-		}
-
-		// tleURLから**非同期で**ダウンロード、カレントディレクトリーに fileNameで保存
-		string content;
-
-		if (tleURL == "http://www.amsat.org/tle/current/daily-bulletin.txt")
-		{
-			using (HttpClient? client = new())
-			content = client.GetStringAsync(tleURL).Result;
-			File.WriteAllText(fileName, content);
-		}
-		else
-		{
-			// Pathの表示をエスケープする
-			tleURL = tleURL.Replace("\\", "\\\\");
-			Debug.WriteLine(tleURL);
-
-			try
-			{	
-				// WEB指定ではなくローカルファイルの場合単純コピー
-				File.Copy(tleURL, fileName);
-			}
-			catch (IOException)
+			foreach (string[] line in sat_list)
 			{
-				// TLEの処理が出来ない場合のメッセージ
-				LblAlarm.Text = "\"Local handmade.txt\" file could'nt use.";
-				LblAlarm.ForeColor = Color.Red;
-				Log.Warning(tleURL + " could not use.");
-				return;
-			}
-		}
+				// sat_listの内容を表示する for debug 
+				//Debug.WriteLine(line[0] + line[1]);
 
-		// ファイルからすべての行を読み込む
-		string[] lines = File.ReadAllLines(fileName);
+				// sat_listを衛星選択コンボボックスのitemに指定
+				CmbSatName.Items.Add(line[0][..^1]);
 
-		// リストを定義
-		string[] sat = new string[2];
-		var num = 0;                        // ヘッダー部を含む行番号
-		var row = 0;                        // データ部のみの行番号
-		var headnum = 0;
+				// 前回使用した衛星をデフォルトとして表示
+				string lastUsed = frmSettings.TxtLastUsed.Text;
+				CmbSatName.SelectedItem = lastUsed;
 
-		// ヘッダーを除く各行を処理して配列に追加
-		foreach (string line in lines)
-		{
-			// TLEのソース増やす必要が有る時はこの条件を追加する
-			if (tleURL[^18..] == "daily-bulletin.txt")
-			{
-				// 特定の文字列で行数を判断しヘッダー部を省く
-				string headerEnd = "www.amsat.org/tle/dailytle.txt";
-				if (line.Contains(headerEnd))
+				// コンボボックスに選択された衛星が無いとき
+				if (CmbSatName.SelectedItem == null)
 				{
-					headnum = num + 2;
+					// メッセージと色の指定
+					LblAlarm.Text = "Select Satellite.";
+					LblAlarm.ForeColor = Color.Blue;
 				}
-			} 
-			else
-			{
-				// 特定の文字列で行数を判断しヘッダー部を省く
-				string headerEnd = "Handmade TLE List";
-				if (line.Contains(headerEnd))   
-					// 特定の文字列で行数を判断しヘッダー部を省く
-					headnum = num + 11;
-			}
-
-			///
-			/// tleURLが増えた時はその処理をここに記述する ///
-			/// 
-
-			// 衛星, NoradIDリストの作成（各ソースで共通）
-			if (num > headnum && headnum != 0)
-			{
-				// １行目は衛星名、２・3行目が2ラインエレメント(TLE)
-				if (row % 3 == 0)
-				{
-					sat[0] = line + ':';
-				}
-
-				// 3行名のスペース区切り2桁目がNoradID
-				if (row % 3 == 2)
-				{
-					string[] parts = line.Split(' ');
-					sat[1] = parts[1];
-					string[] tmp = { sat[0], sat[1] };
-					sat_list.Add(tmp);
-				}
-				row++;
-			}
-			num++;
-		}
-
-		// 衛星のリストに無いものをテストとしてリスト末端に加える
-		string[] tmp2 = { "ZZ/ TEST /ZZ:", "00000" };
-		sat_list.Add(tmp2);
-
-		foreach (string[] line in sat_list)
-		{
-			// sat_listの内容を表示する for debug 
-			//Debug.WriteLine(line[0] + line[1]);
-
-			// sat_listを衛星選択コンボボックスのitemに指定
-			CmbSatName.Items.Add(line[0][..^1]);
-			string lastUsed = frmSettings.TxtLastUsed.Text;
-			CmbSatName.SelectedItem = lastUsed;
-			if (CmbSatName.SelectedItem == null)
-			{
-				// 選択された衛星が無い場合のメッセージ
-				LblAlarm.Text = "Select Satellite.";
-				LblAlarm.ForeColor = Color.Blue;
 			}
 		}
 	}
@@ -596,6 +429,9 @@ public partial class FrmMain : Form
 		// 選択した衛星名を設定パネルの TxtLastUsed.text に反映させる
 		frmSettings.TxtLastUsed.Text = CmbSatName.Text;
 		Log.Information("Set satellite to " + CmbSatName.Text + ".");
+		
+		
+		if (sat_list == null) return;
 
 		foreach (string[] line in sat_list)
 		{
@@ -723,8 +559,7 @@ public partial class FrmMain : Form
 	//
 	private void StartKissThread()
 	{
-//		Thread kissThread = new(new ThreadStart(Program.StartClient));
-	
+		// KISSデータ取得専用サブスレッドを起ち上げる
 	    Thread kissThread = new Thread(() => 
 		{
         	// Settingsの接続情報チェックをした上でポートに接続を試みる処理
@@ -750,7 +585,6 @@ public partial class FrmMain : Form
 
 	
 	//	StartKissThreadにおけるサブメソッド -----------------------------------
-	
 	// サブスレッドにおける代理メソッド
 	public delegate void DelegateUpdateLblMsg(string msg, Color color);
 
@@ -771,7 +605,7 @@ public partial class FrmMain : Form
 		}
 	}
 
-	// ラベルの変更
+	// UIスレッドにおけるラベルの変更
 	private void UpdateLblMsg(string msg, Color color)
 	{
 		if(LblMsg.InvokeRequired)
@@ -783,7 +617,7 @@ public partial class FrmMain : Form
 		LblMsg.ForeColor = color;
 	}
 	
-	
+	// 指定アドレス・ポートへの接続を試みた結果をリターン
 	private bool TryConnectToPort()
 	{
 		// Settingsからアドレスとポートのデータを読む
@@ -818,7 +652,7 @@ public partial class FrmMain : Form
 	    }
 	}
 	
-	// Settingsの接続情報が設定されているかのチェック
+	// Settingsの接続情報が設定されているかのチェック結果をリターン
 	private bool PortCheck()
 	{
 		string addr = frmSettings.TxtKISS_Address.Text;
@@ -908,16 +742,8 @@ public partial class FrmMain : Form
 	public delegate void DelegateSetRecevedData(byte[] data);
 	private void SetReceivedData(byte[] data)
 	{
-		// Invokeが必要か不要か？
-//		if (InvokeRequired)
-//		{
-//			Invoke(new DelegateSetRecevedData(SetReceivedData), [data]);
-//		}
-//		else
-//		{
-			// メインスレットの変数にデータを代入
-			recvData = data;
-//		}
+		// メインスレットの変数にデータを代入
+		recvData = data;
 
 		// RAWデータファイル NoradID_yyyy-mm-ddTHHMMSS.kss に保存
 		try
@@ -1268,7 +1094,5 @@ public partial class FrmMain : Form
 		}
 
 	}
-
-
 }
 

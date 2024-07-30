@@ -119,6 +119,81 @@
 				Log.Information("Selected TLE file is " + TxtTLE_Source.Text);
 			}
 		}
+
+		//************************************************************
+		//	TLMForwarder.iniから設定を読みFrmSettingsの各項目に代入する
+		//************************************************************
+
+		public void ReadSettingsFromfile()
+		{
+			// ファイルが存在するか確認
+			if (File.Exists(filePath))
+			{
+				// ファイルからすべての行を読み込む
+				string[] lines = File.ReadAllLines(filePath);               // 設定ファイルからの行データを取得
+
+				// 各行を処理する
+				foreach (string line in lines)
+				{
+					// セパレータ'='で分割
+					string[] parts = line.Split('=');
+
+					if (parts.Length == 2)
+					{
+						// 項目名をテキストボックス名として取得
+						string textBoxName = "Txt" + parts[0].Trim();
+						string textBoxText = parts[1].Trim();
+
+
+						// 対応するテキストボックスに設定値を代入
+						if (Controls.ContainsKey(textBoxName))
+						{
+							TextBox? textBox = Controls[textBoxName] as TextBox;
+
+							if (textBox != null)
+							{
+								try
+								{
+									// 他のフォームのため Invoke が必要か判断
+									if (InvokeRequired)
+									{
+										Invoke((System.Windows.Forms.MethodInvoker)delegate
+										{
+											textBox.Text = textBoxText;
+										});
+									}
+									else
+									{	// Invokeが不要な場合
+										textBox.Text = textBoxText;
+									}
+								}
+								catch (Exception ex)
+								{
+									Log.Warning($"Error setting text for {textBoxName}: {ex.Message}");
+								}
+							}
+							else
+							{
+								Log.Warning ($"{textBoxName} is not a TextBox.");
+							}
+						}
+						else
+						{
+							Log.Warning($"{textBoxName} does not exist in frmSettings.Controls.");
+        		
+						}
+					}
+				}
+				Log.Information("TLMForwarder.ini has been successfully read.");
+			}
+			else
+			{
+				/* ファイルが存在しない場合の処理 */
+				MessageBox.Show("TLMForwarder.ini must be in CURRENT Dir.\n" +
+								"Current DIR is now " + Directory.GetCurrentDirectory());
+				Log.Warning("No file named TLMForwarder.ini.");
+			}
+		}
 	}
 }
 
