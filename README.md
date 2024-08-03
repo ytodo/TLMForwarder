@@ -81,7 +81,8 @@ HADES-D
 	
 2024-06-29	ver 2.2.1	ローカルフォルダ（例：Documents）にhomemade.txtの名前で作ったTLEリストから
 				サテライトリストを作成出来るようにした
-				付属DLL	IO-117(53106), LEDSAT(49069), KASHIWA(59508), CubeBel-2(57175),	GRBAlpha(47959)
+				付属DLL	IO-117(53106), LEDSAT(49069), KASHIWA(59508), CubeBel-2(57175),
+					GRBAlpha(47959)
 	
 2024-06-26	ver 2.2.0	Pythonの仮想環境を又は実環境を必要としない、コンパイルされた post_request.exeを
 				使用したモデルに変更
