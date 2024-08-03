@@ -494,7 +494,6 @@
 		Name = "FrmMain";
 		Text = "TLMForwarder";
 		Load += FrmMain_Load;
-//		Load += new System.EventHandler(FrmMain_Load);
 		((System.ComponentModel.ISupportInitialize)PicTop).EndInit();
 		tabControl.ResumeLayout(false);
 		tabDigipeater.ResumeLayout(false);
@@ -509,13 +508,13 @@
 
 	private Button BtnSettings;
 	private Button BtnQuit;
-//	private System.Windows.Forms.Timer Timer1;
+//	private System.Windows.Forms.Timer Timer1;			// Test
 	private Label LblDateTime;
 	private RadioButton RbnUTC;
 	private RadioButton RbnLocal;
 	private Label label1;
 	private Label label2;
-	private Label LblNoradID;
+	public Label LblNoradID;
 	public CheckBox ChkForwarding;
 	private Label label3;
 	private Label LblFrameNum;

@@ -6,7 +6,6 @@ using System.Data;
 using System.Runtime.InteropServices;
 using System.Timers;
 using Serilog;
-using System.CodeDom.Compiler;
 
 namespace TLMForwarder;
 
@@ -18,9 +17,9 @@ public partial class FrmMain : Form
 	
 	// 設定ファイルのパスをreadonlyで指定（readonlyだとそれぞれのフォームで指定要）
 	public readonly string confPath = @".\config\TLMForwarder.ini";	// 設定用ファイル
-	private readonly string version = "2.3.1";						// バージョン
-	public readonly FrmSettings frmSettings = new();				// FrmSettingsのインスタンス
-	private List<string[]>? sat_list = [];					// 文字配列リストとしてsat_listを作成
+	private readonly string version = "2.3.2-Debug";				// バージョン
+	public FrmSettings frmSettings = new();							// FrmSettingsのインスタンス
+	private List<string[]>? sat_list = [];							// 文字配列リストとしてsat_listを作成
 	public static object? classInstance;							// DLLのクラスインスタンス
 	public Type? classType;											// DLLのクラスタイプ
 	public bool clientStop = false;									// tcpclientに対するstop flag
@@ -32,10 +31,10 @@ public partial class FrmMain : Form
 	public readonly byte[]? tmpBuff;								// SubThreadからMainThreadへの受け渡しデータ
 	public int forwardNum = 0;										// 転送(送信)した回数
 	public int apliedNum = 0;										// 受け付けられたテレメトリー数
-	private static System.Timers.Timer? aTimer;
-	private static FrmMain? instance;
-	private TcpClient? client;
-	private NetworkStream? stream;
+	private static System.Timers.Timer? aTimer;						// Timerの生成
+	private static FrmMain? instance;								// FrmMain自身のインスタンス
+	private TcpClient? client;										// Modem接続clientの作成
+	private NetworkStream? stream;									// Modemから流入するストリーム
 	
 	// APIを呼び出すため、対象のＤＬＬをインポート(Formの[X]コントロールを消す為）
 	[LibraryImport("USER32.DLL")]
@@ -189,8 +188,23 @@ public partial class FrmMain : Form
 		// TCPクライアントとサブスレッドの停止
 		clientStop = true;
 
-		// 終了時、後処理
-		ClosingProcess();
+		if (kssPath != null && hexPath != null)
+		{
+			// 終了時、後処理 (staticでないクラスの呼び出しにインスタンスが必要)
+			FileControl.ClosingProcess(kssPath, hexPath);
+		}
+
+		//
+		// フォームの現在座標を取得し次回起動時継承するためファイルに保存
+		//
+		int x = Location.X;
+		int y = Location.Y;
+		frmSettings.TxtWindow_x.Text = x.ToString();
+		frmSettings.TxtWindow_y.Text = y.ToString();
+
+		// Settingsの設定を最終的に保存する	
+		frmSettings.SaveDatatoFile();
+		Log.Information("Settings completely saved.");
 
 		// 終了ログ情報とログ最終書き出し
 		Log.Information("Exit the Application." + '\n');
@@ -198,96 +212,6 @@ public partial class FrmMain : Form
 
 		// アプリケーション終了
 		Application.Exit();
-	}
-
-	//***********************
-	// Closing 処理
-	//***********************
-	private void ClosingProcess()
-	{
-		//
-		// 空のファイルが有れば削除する
-		//
-		if (frmSettings.TxtLogDir.Text != "")
-		{
-			string logDir = frmSettings.TxtLogDir.Text;                                     // LogDir内の・・
-			string[] files = Directory.GetFiles(logDir, "*", SearchOption.AllDirectories);  // サブフォルダも含む・・
-			foreach (string file in files)
-			{
-				FileInfo? fileInfo = new(file);
-				if (fileInfo.Length == 0)                                                   // 空ファイルを・・
-				{
-					File.Delete(file);                                                      // すべて削除。
-					Log.Information($"{file}" + " (Size: 0) was deleted.");
-				}
-			}
-		}
-
-		//
-		//	transaction fileである TLE.txt を削除
-		//
-		if (File.Exists(@".\TLE.txt"))
-		{
-			File.Delete(@".\TLE.txt");
-		}
-
-		//
-		// もし.kssファイルが存在したら.hexに変換する
-		//
-		if (File.Exists(kssPath))
-		{
-			try
-			{
-				// certutilコマンドを使ってKISSファイルを16進数のテキストファイルに変換
-				ProcessStartInfo psi = new()
-				{
-					FileName = "certutil",                                              // コマンド
-					Arguments = $"-encodehex \"{kssPath}\" \"{hexPath}\"",              // パラメータとパス
-					RedirectStandardOutput = true,                                      // 標準的メッセージ出力
-					RedirectStandardError = true,                                       // エラーメッセージ出力
-					UseShellExecute = false,                                            // シェルを起ち上げるか
-					CreateNoWindow = true,                                              // 別途Windowを起ち上げるか
-				};
-
-				using Process? process = Process.Start(psi);
-
-				// コマンドの実行結果を表示
-				using (StreamReader? reader = process?.StandardOutput)
-				{
-					string? result = reader?.ReadToEnd();
-					result = result?.Replace(Environment.NewLine, "");
-					Log.Information($"KSS->HEX: {result}");
-				}
-				// コマンド実行時エラーを表示
-				using (StreamReader? reader = process?.StandardError)
-				{
-					string? error = reader?.ReadToEnd();
-					if (error != "")
-					{
-						Log.Error("Error: " + error);
-					}
-				}
-				process?.WaitForExit();
-			}
-			catch (Exception ex)
-			{
-				Log.Error($"Error: {ex.Message}");
-			}
-		}
-		else
-		{
-			Log.Information("KISS File is not exist.");
-		}
-
-		//
-		// フォームの現在座標を取得し次回起動時継承するためファイルに保存
-		//
-		int x = this.Location.X;
-		int y = this.Location.Y;
-		frmSettings.TxtWindow_x.Text = x.ToString();
-		frmSettings.TxtWindow_y.Text = y.ToString();
-		frmSettings.SaveDatatoFile();
-		Log.Information("Settings completely saved.");
 	}
 
 	//************************************
@@ -315,8 +239,8 @@ public partial class FrmMain : Form
 		// 設定ファイルからURLを読み、TLE.txt名でダウンロード
 		string tleURL = frmSettings.TxtTLE_Source.Text;
 
-		// クラス名とメソッド名で他ファイルの処理を呼び出す。（元データの作成）
-		var results = SatNameList.TLE2SatnameList(tleURL);
+		// クラス名とメソッド名で他ファイルの処理を呼び出す。（CreateSatnameList.cs)）
+		var results = CreateSatList.TLE2SatnameList(tleURL);
 		sat_list = results.sat_list;
 		LblAlarm.Text = results.text;
 		LblAlarm.ForeColor = results.color;
@@ -425,6 +349,11 @@ public partial class FrmMain : Form
 	//**************************************************************
 	private void CmbSatName_SelectionIndexChanged(object sender, EventArgs e)
 	{
+		if (CmbSatName.Text != null && kssPath != null && hexPath != null)
+		{
+			// 前回しようファイルの消去など（FileControl.cs)）
+			FileControl.ClosingProcess(kssPath, hexPath);
+		}
 
 		// 選択した衛星名を設定パネルの TxtLastUsed.text に反映させる
 		frmSettings.TxtLastUsed.Text = CmbSatName.Text;
@@ -448,8 +377,8 @@ public partial class FrmMain : Form
 		apliedNum = 0;
 		LblFrameNum.Text = string.Empty;
 
-		/* 衛星名に即したログファイルを作成 */
-		CreateAppLog();
+		/* 衛星名に即したログファイルを作成 (Filecontrol.cs) */
+		(tlmPath, digPath, kssPath, hexPath) = FileControl.CreateAppLog(frmSettings, this);
 
 		// DLLのクラスインスタンスを作成
 		string dllFilePath = "./dll/" + LblNoradID.Text + ".dll";
@@ -484,71 +413,6 @@ public partial class FrmMain : Form
 			Log.Error("Not exists " + dllFilePath + " for " + CmbSatName.Text + ".");
 		}
 	}
-
-	//**************************************************************
-	//	衛星毎のログファイルを作成する
-	//**************************************************************
-	public void CreateAppLog()
-	{
-		// LogDirを取得し整形する
-		string logDir = frmSettings.TxtLogDir.Text;
-
-		try
-		{
-			char lastChar = logDir[^1];
-			if (lastChar != '\\')
-			{
-				logDir += "\\";
-			}
-			logDir += LblNoradID.Text + "\\";
-		}
-		catch (IndexOutOfRangeException)
-		{
-			MessageBox.Show("Please Choose the folder for \"LogDir\" in the Settings.");
-			Log.Error("Nothing selected for LogDir.");
-			return;
-		}
-
-		// LogDirが存在しない時は作成する
-		if (!Directory.Exists(logDir))
-		{
-			Directory.CreateDirectory(logDir);
-			Log.Information("Made Dir " + logDir);
-		}
-
-		Log.Information("LogDir: " + logDir);
-
-		// ファイル名を作成する
-		string timeStamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ").Replace(":", "");
-		string tlmFile = LblNoradID.Text + "_" + timeStamp + "_" + "forwarding.log";
-		string digFile = LblNoradID.Text + "_" + timeStamp + "_" + "digipeater.log";
-		string kssFile = LblNoradID.Text + "_" + timeStamp + ".kss";
-		string hexFile = LblNoradID.Text + "_" + timeStamp + ".hex";
-
-		// パブリックで定義
-		tlmPath = Path.Combine(logDir, tlmFile);
-		digPath = Path.Combine(logDir, digFile);
-		kssPath = Path.Combine(logDir, kssFile);
-		hexPath = Path.Combine(logDir, hexFile);
-
-		// 先ず空のファイルが有れば前もって削除する
-		string[] files = Directory.GetFiles(logDir);
-		foreach (string file in files)
-		{
-			FileInfo? fileInfo = new(file);
-			if (fileInfo.Length == 0)
-			{
-				File.Delete(file);
-				Log.Information($"{file}" + " (Size: 0) was deleted.");
-			}
-		}
-
-		// TelemetryとDigipeaterのログファイルを生成
-		File.Create(tlmPath).Close();
-		File.Create(digPath).Close();
-		File.Create(kssPath).Close();
-	}
-
 
 	//**************************************************
 	// フォームがロードされた後、バックグラウンドスレッドを開始
@@ -813,7 +677,7 @@ public partial class FrmMain : Form
 					string url = frmSettings.TxtDatabase.Text;
 					string database = url + "/api/telemetry/?";
 
-					foreach (var outputLine in ExecuteTestExe(payloadString, database))
+					foreach (var outputLine in ExecuteRequestExe(payloadString, database))
 					{
 						// 返り値は改行されたpayloadとstatus Codeで構成されている
 						string[] results = $"{outputLine}".Split('\n');
@@ -895,7 +759,7 @@ public partial class FrmMain : Form
 		}
 	}
 
-	static IEnumerable<string> ExecuteTestExe(string arg1, string arg2)
+	static IEnumerable<string> ExecuteRequestExe(string arg1, string arg2)
 	{
 		// プロセスの設定
 		ProcessStartInfo startInfo = new()
