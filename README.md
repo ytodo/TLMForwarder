@@ -20,6 +20,7 @@ CC BY-NC-SA&nbsp;&nbsp;&nbsp;
 47959.dll	GRBAlpha
 58567.dll	HADES-D		(SO-121)
 60243.dll	ROBUSTA-3A
+60246.dll	CatSat
 
 //-------------------------------------------------------------------------------
 // Sample of NEW Satellite's TLE file which is Wrote yourself as handmade.txt.
