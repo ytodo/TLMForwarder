@@ -10,9 +10,10 @@ public class FileControl
 	//**************************************************************
 	public static (string, string, string, string) CreateAppLog(FrmSettings frmSettings, FrmMain frmMain)
 	{
+		// ローカル変数 logDir を定義
 		string logDir = string.Empty;
 
-		// LogDirを取得し整形する
+		// LogDirを取得し整形する（Invokeが必要な場合を想定
 		if (frmSettings.InvokeRequired)
 		{
 			frmSettings.Invoke(new Action(() =>
@@ -25,8 +26,7 @@ public class FileControl
 			logDir = frmSettings.TxtLogDir.Text;
 		}
 
-Debug.WriteLine("FileControl" + logDir);
-
+		// logDir の '\' をエスケープし、ログフォルダの中に NoradID のフォルダを作成
 		try
 		{
 
@@ -40,8 +40,11 @@ Debug.WriteLine("FileControl" + logDir);
 		}
 		catch (IndexOutOfRangeException)
 		{
+			// LogDirが設定されていない場合
 			MessageBox.Show("Please Choose the folder for \"LogDir\" in the Settings.");
 			Log.Error("Nothing selected for LogDir.");
+			
+			// 空を返す
 			return ("", "", "", "");
 		}
 		
@@ -62,13 +65,13 @@ Debug.WriteLine("FileControl" + logDir);
 		string kssFile = frmMain.LblNoradID.Text + "_" + timeStamp + ".kss";
 		string hexFile = frmMain.LblNoradID.Text + "_" + timeStamp + ".hex";
 
-		// パブリックで定義
+		// ログ用フォルダからのファイルパスを定義
 		string tlmPath = Path.Combine(logDir, tlmFile);
 		string digPath = Path.Combine(logDir, digFile);
 		string kssPath = Path.Combine(logDir, kssFile);
 		string hexPath = Path.Combine(logDir, hexFile);
 
-		// 先ず空のファイルが有れば前もって削除する
+		// 先ずサイズゼロのファイルが有れば前もって削除する
 		string[] files = Directory.GetFiles(logDir);
 		foreach (string file in files)
 		{
@@ -85,12 +88,14 @@ Debug.WriteLine("FileControl" + logDir);
 		File.Create(digPath).Close();
 		File.Create(kssPath).Close();
 
+		// 作成したファイルパスを返す
 		return (tlmPath, digPath, kssPath, hexPath);
 	}
 
-	//***********************
+
+	//**************************************************************
 	// Closing 処理
-	//***********************
+	//**************************************************************
 	public static void ClosingProcess(string kssPath, string hexPath)
 	{
 		//
@@ -150,6 +155,7 @@ Debug.WriteLine("FileControl" + logDir);
 					result = result?.Replace(Environment.NewLine, "");
 					Log.Information($"KSS->HEX: {result}");
 				}
+
 				// コマンド実行時エラーを表示
 				using (StreamReader? reader = process?.StandardError)
 				{
