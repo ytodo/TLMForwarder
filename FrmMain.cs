@@ -17,7 +17,7 @@ public partial class FrmMain : Form
 	
 	// 設定ファイルのパスをreadonlyで指定（readonlyだとそれぞれのフォームで指定要）
 	public readonly string confPath = @".\config\TLMForwarder.ini";	// 設定用ファイル
-	private readonly string version = "2.3.2-Debug";				// バージョン
+	private readonly string version = "2.3.2";				// バージョン
 	public FrmSettings frmSettings = new();							// FrmSettingsのインスタンス
 	private List<string[]>? sat_list = [];							// 文字配列リストとしてsat_listを作成
 	public static object? classInstance;							// DLLのクラスインスタンス

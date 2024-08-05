@@ -43,7 +43,7 @@
 			// pictureBox1
 			// 
 			pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-			pictureBox1.Location = new Point(28, 35);
+			pictureBox1.Location = new Point(28, 10);
 			pictureBox1.Name = "pictureBox1";
 			pictureBox1.Size = new Size(120, 120);
 			pictureBox1.TabIndex = 0;
@@ -53,7 +53,7 @@
 			// 
 			label1.AutoSize = true;
 			label1.Font = new Font("Yu Gothic UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
-			label1.Location = new Point(161, 42);
+			label1.Location = new Point(161, 20);
 			label1.Name = "label1";
 			label1.Size = new Size(103, 20);
 			label1.TabIndex = 1;
@@ -64,7 +64,7 @@
 			// 
 			LblVersion.AutoSize = true;
 			LblVersion.Font = new Font("Yu Gothic UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
-			LblVersion.Location = new Point(264, 42);
+			LblVersion.Location = new Point(264, 20);
 			LblVersion.Name = "LblVersion";
 			LblVersion.Size = new Size(57, 20);
 			LblVersion.TabIndex = 2;
@@ -92,15 +92,21 @@
 			// LblCopyright
 			// 
 			LblCopyright.AutoSize = true;
-			LblCopyright.Location = new Point(161, 82);
+			LblCopyright.Location = new Point(30, 135);
 			LblCopyright.Name = "LblCopyright";
 			LblCopyright.Size = new Size(0, 15);
 			LblCopyright.TabIndex = 5;
+			LblCopyright.Text = "The copyright belongs to me. However, they inherit" + Environment.NewLine +
+								"the credit, do not use it for commercial purposes," + Environment.NewLine +
+								"and can freely modify and distribute the changes as" + Environment.NewLine +
+								"long as they inherit the same license form." + Environment.NewLine +
+								"CC BY-NC-SA" + Environment.NewLine +
+								"https://github.com/ytodo/TLMForwarder";
 			// 
 			// label3
 			// 
 			label3.AutoSize = true;
-			label3.Location = new Point(167, 109);
+			label3.Location = new Point(167, 87);
 			label3.Name = "label3";
 			label3.Size = new Size(100, 15);
 			label3.TabIndex = 6;
@@ -109,7 +115,7 @@
 			// label4
 			// 
 			label4.AutoSize = true;
-			label4.Location = new Point(167, 132);
+			label4.Location = new Point(167, 110);
 			label4.Name = "label4";
 			label4.Size = new Size(144, 15);
 			label4.TabIndex = 7;
