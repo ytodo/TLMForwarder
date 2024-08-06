@@ -219,7 +219,7 @@ public partial class FrmMain : Form
 	//************************************
 	private void BtnInfo_Click(object sender, EventArgs e)
 	{
-		FrmInfo? frmInfo = new(version);
+		FrmInfo? frmInfo = new(version, LblNoradID.Text);
 		frmInfo.ShowDialog(this);
 	}
 

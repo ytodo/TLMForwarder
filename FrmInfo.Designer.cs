@@ -38,6 +38,7 @@
 			label3 = new Label();
 			label4 = new Label();
 			LblGitHub = new LinkLabel();
+			LblSatNOGS = new LinkLabel();
 			((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
 			SuspendLayout();
 			// 
@@ -128,12 +129,24 @@
 			LblGitHub.Text = "https://github.com";
 			LblGitHub.LinkClicked += LblGitHub_LinkClicked;
 			// 
+			// LblSatNOGS
+			// 
+			LblSatNOGS.AutoSize = true;
+			LblSatNOGS.Location = new Point(204, 205);
+			LblSatNOGS.Name = "LblSatNOGS";
+			LblSatNOGS.Size = new Size(126, 15);
+			LblSatNOGS.TabIndex = 9;
+			LblSatNOGS.TabStop = true;
+			LblSatNOGS.Text = "https://db.satnogs.org";
+			LblSatNOGS.LinkClicked += LblSatNOGS_LinkClicked;
+			// 
 			// FrmInfo
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackColor = SystemColors.ControlLight;
 			ClientSize = new Size(372, 257);
+			Controls.Add(LblSatNOGS);
 			Controls.Add(LblGitHub);
 			Controls.Add(label4);
 			Controls.Add(label3);
@@ -162,5 +175,6 @@
 		private Label label3;
 		private Label label4;
 		private LinkLabel LblGitHub;
+		private LinkLabel LblSatNOGS;
 	}
 }

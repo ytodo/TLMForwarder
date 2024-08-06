@@ -153,9 +153,8 @@
 		LblNoradID.AutoSize = true;
 		LblNoradID.Location = new Point(368, 37);
 		LblNoradID.Name = "LblNoradID";
-		LblNoradID.Size = new Size(51, 15);
+		LblNoradID.Size = new Size(0, 15);
 		LblNoradID.TabIndex = 8;
-		LblNoradID.Text = "NoradID";
 		// 
 		// ChkForwarding
 		// 
@@ -222,7 +221,7 @@
 		LblMsg.Font = new Font("Yu Gothic UI", 9F, FontStyle.Bold);
 		LblMsg.Location = new Point(27, 479);
 		LblMsg.Name = "LblMsg";
-		LblMsg.Size = new Size(40, 15);
+		LblMsg.Size = new Size(85, 15);
 		LblMsg.TabIndex = 16;
 		LblMsg.Text = "Modem Status";
 		// 
