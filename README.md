@@ -13,14 +13,16 @@ CC BY-NC-SA&nbsp;&nbsp;&nbsp;
 ###################
  Attached DLL List
 ###################
-53106.dll	GreenCube	(IO-117)
-49069.dll	LEDSAT
-59508.dll	KASHIWA
-57175.dll	CubeBel-2	(EU11S)
 47959.dll	GRBAlpha
+49069.dll	LEDSAT
+53106.dll	GreenCube	(IO-117)
+57175.dll	CubeBel-2	(EU11S)
+58470.dll	ENSO
 58567.dll	HADES-D		(SO-121)
+59508.dll	KASHIWA
 60243.dll	ROBUSTA-3A
 60246.dll	CatSat
+
 
 //-------------------------------------------------------------------------------
 // Sample of NEW Satellite's TLE file which is Wrote yourself as handmade.txt.
@@ -63,6 +65,7 @@ HADES-D
 //-------------------------------------------------------------------------------
 // バージョンアップと変更点 ( Release Note )
 //-------------------------------------------------------------------------------
+2024-08-06	ver 2.3.3	FrmInfoを見直し GitHub と SatNOGS へのリンクを設けた。
 
 2024-08-03	ver 2.3.2	ソース見直し。ファイル一部さらに分割。結果、再起動無しで衛星の切替可能にした。
 
