@@ -485,6 +485,12 @@
         PORTLkxoIr+aX+rtGwvLsZMY4DyFVVVVVVqrqq6q+vWd2WOSpvrHD+zviZqpAHKe35//2Q==
 </value>
   </data>
+  <data name="LblCopyright.Text" xml:space="preserve">
+    <value>The copyright belongs to me. However, they inherit the credit,
+do not use it for commercial purposes, and can freely modify
+and distribute the changes as long as they inherit the same
+license form.   CC BY-NC-SA</value>
+  </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAEAMDAAAAEAIACoJQAAFgAAACgAAAAwAAAAYAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

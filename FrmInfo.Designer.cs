@@ -37,6 +37,7 @@
 			LblCopyright = new Label();
 			label3 = new Label();
 			label4 = new Label();
+			LblGitHub = new LinkLabel();
 			((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
 			SuspendLayout();
 			// 
@@ -52,7 +53,7 @@
 			// label1
 			// 
 			label1.AutoSize = true;
-			label1.Font = new Font("Yu Gothic UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
+			label1.Font = new Font("Yu Gothic UI", 11.25F);
 			label1.Location = new Point(161, 20);
 			label1.Name = "label1";
 			label1.Size = new Size(103, 20);
@@ -63,7 +64,7 @@
 			// LblVersion
 			// 
 			LblVersion.AutoSize = true;
-			LblVersion.Font = new Font("Yu Gothic UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
+			LblVersion.Font = new Font("Yu Gothic UI", 11.25F);
 			LblVersion.Location = new Point(264, 20);
 			LblVersion.Name = "LblVersion";
 			LblVersion.Size = new Size(57, 20);
@@ -73,7 +74,7 @@
 			// BtnCloseInfo
 			// 
 			BtnCloseInfo.BackColor = SystemColors.ButtonFace;
-			BtnCloseInfo.Location = new Point(142, 229);
+			BtnCloseInfo.Location = new Point(149, 229);
 			BtnCloseInfo.Name = "BtnCloseInfo";
 			BtnCloseInfo.Size = new Size(75, 23);
 			BtnCloseInfo.TabIndex = 3;
@@ -92,16 +93,11 @@
 			// LblCopyright
 			// 
 			LblCopyright.AutoSize = true;
-			LblCopyright.Location = new Point(30, 135);
+			LblCopyright.Location = new Point(25, 140);
 			LblCopyright.Name = "LblCopyright";
-			LblCopyright.Size = new Size(0, 15);
+			LblCopyright.Size = new Size(332, 60);
 			LblCopyright.TabIndex = 5;
-			LblCopyright.Text = "The copyright belongs to me. However, they inherit" + Environment.NewLine +
-								"the credit, do not use it for commercial purposes," + Environment.NewLine +
-								"and can freely modify and distribute the changes as" + Environment.NewLine +
-								"long as they inherit the same license form." + Environment.NewLine +
-								"CC BY-NC-SA" + Environment.NewLine +
-								"https://github.com/ytodo/TLMForwarder";
+			LblCopyright.Text = resources.GetString("LblCopyright.Text");
 			// 
 			// label3
 			// 
@@ -121,12 +117,24 @@
 			label4.TabIndex = 7;
 			label4.Text = "JE3HCZ / TODO Yoshiharu";
 			// 
+			// LblGitHub
+			// 
+			LblGitHub.AutoSize = true;
+			LblGitHub.Location = new Point(203, 185);
+			LblGitHub.Name = "LblGitHub";
+			LblGitHub.Size = new Size(108, 15);
+			LblGitHub.TabIndex = 8;
+			LblGitHub.TabStop = true;
+			LblGitHub.Text = "https://github.com";
+			LblGitHub.LinkClicked += LblGitHub_LinkClicked;
+			// 
 			// FrmInfo
 			// 
 			AutoScaleDimensions = new SizeF(7F, 15F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackColor = SystemColors.ControlLight;
-			ClientSize = new Size(354, 257);
+			ClientSize = new Size(372, 257);
+			Controls.Add(LblGitHub);
 			Controls.Add(label4);
 			Controls.Add(label3);
 			Controls.Add(LblCopyright);
@@ -153,5 +161,6 @@
 		private Label LblCopyright;
 		private Label label3;
 		private Label label4;
+		private LinkLabel LblGitHub;
 	}
 }
