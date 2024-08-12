@@ -571,11 +571,11 @@ public partial class FrmMain : Form
 				}
 				catch (Exception)
 				{
-					/*// Debug
+					// Debug
 					//string filePath = @"S:\Satellites_Data\SATLOG\53106\53106_test.kss";
-					string filePath = @"S:\Satellites_Data\SATLOG\53106\53106_test_digi.kss";
+					//string filePath = @"S:\Satellites_Data\SATLOG\53106\53106_test_digi.kss";
 					//string filePath = @"S:\Satellites_Data\SATLOG\59508\59508_2024-06-19T025201.053Z.kss";
-
+					string filePath = @"S:\Satellites_Data\SATLOG\47959\47959_test.kss";
 
 					byte[] tmpBuff;
 					using (FileStream fs = new(filePath, FileMode.Open, FileAccess.Read))
