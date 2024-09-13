@@ -15,6 +15,12 @@ public class CreateSatList
 		// リスト sat_list を定義
 		List<string[]>? sat_list = [];
 
+		//	異常終了により残ったTLE.txt が有れば削除
+		if (File.Exists(@".\TLE.txt"))
+		{
+			File.Delete(@".\TLE.txt");
+		}
+
 		// TLE.txt名でダウンロード
 		string fileName = @"TLE.txt";
 		string text;
