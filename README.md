@@ -19,10 +19,9 @@ CC BY-NC-SA&nbsp;&nbsp;&nbsp;
 57175.dll	CubeBel-2	(EU11S)
 58470.dll	ENSO
 58567.dll	HADES-D		(SO-121)
-59508.dll	KASHIWA
 60243.dll	ROBUSTA-3A
 60246.dll	CatSat
-
+60954.dll	Sakura
 
 //-------------------------------------------------------------------------------
 // Sample of NEW Satellite's TLE file which is Wrote yourself as handmade.txt.
@@ -65,6 +64,9 @@ HADES-D
 //-------------------------------------------------------------------------------
 // バージョンアップと変更点 ( Release Note )
 //-------------------------------------------------------------------------------
+2024-09-30	ver 2.3.5	Digipeater用のグリッド名変更とフィールド幅調整を行った。また各DLLでの
+						Digipeater表示用アルゴリズムを見直した。
+
 2024-09-13	ver 2.3.4	前回の異常終了によりTLEファイルが残っている場合起動しないのを修正した。
 
 2024-08-06	ver 2.3.3	FrmInfoを見直し GitHub と SatNOGS へのリンクを設けた。

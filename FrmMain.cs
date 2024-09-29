@@ -17,7 +17,7 @@ public partial class FrmMain : Form
 	
 	// 設定ファイルのパスをreadonlyで指定（readonlyだとそれぞれのフォームで指定要）
 	public readonly string confPath = @".\config\TLMForwarder.ini";	// 設定用ファイル
-	private readonly string version = "2.3.4";				// バージョン
+	private readonly string version = "2.3.5";				// バージョン
 	public FrmSettings frmSettings = new();							// FrmSettingsのインスタンス
 	private List<string[]>? sat_list = [];							// 文字配列リストとしてsat_listを作成
 	public static object? classInstance;							// DLLのクラスインスタンス
@@ -52,6 +52,12 @@ public partial class FrmMain : Form
     public FrmMain()
     {
         InitializeComponent();
+
+		// GridDigipeaterのColomn5のタイトル変更
+		Column5.HeaderText = "Via";
+		Column2.Width = 100;
+		Column3.Width = 100;
+		Column4.Width = 265;
 
 		// このフォーム自体のインスタンス
 		instance = this;
@@ -637,12 +643,13 @@ public partial class FrmMain : Form
 			object[] parameters = [recvData];
 
 			// 2要素のタプルで処理データを受け取る
-			//string hexString = string.Empty;
 			string telemetryString = string.Empty;
 			string logData = string.Empty;
+		//	string columnName = string.Empty;		//元 delayだった右端のコラムの名前を指定できるようにする
 			object? dllResult = method?.Invoke(classInstance, parameters);
 			if (dllResult is ValueTuple<string, string> tupleResult)
 			{
+			//	(telemetryString, logData, columnName) = tupleResult;
 				(telemetryString, logData) = tupleResult;
 			}
 			/////////////////////////////////////////////////////////////////
@@ -749,7 +756,7 @@ public partial class FrmMain : Form
 			// Digipeaterデータ（交信ログ）の処理
 			if (!string.IsNullOrEmpty(logData))
 			{
-				DisplayQSO(logData);
+				DisplayQSO(logData); //, columnName);
 			}
 		}
 		else
@@ -870,8 +877,18 @@ public partial class FrmMain : Form
 	///
 	///  テーブル形式に整形して画面表示、ログファイルを残す。
 	/// 
-	private void DisplayQSO(string logData)
+	private void DisplayQSO(string logData) //, string columnName)
 	{
+		//グリッドのタイトル変更
+	//	if (columnName != "")
+	//	{
+	//		Column5.HeaderText = columnName;
+	//	}
+	//	else
+	//	{
+	//		Column5.HeaderText = "etc.";
+	//	}
+
 		// 表示・ログ・JSONに使用するTimeStampを生成
 		DateTime dtUtc = DateTime.UtcNow;                                       // UTC限定用
 		DateTime dt;                                                            // ローカル・UTC切替用
