@@ -107,7 +107,7 @@
 			label3.Name = "label3";
 			label3.Size = new Size(100, 15);
 			label3.TabIndex = 6;
-			label3.Text = "Copyright © 2024";
+			label3.Text = "Copyright © 2024-2025";
 			// 
 			// label4
 			// 
