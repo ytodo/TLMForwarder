@@ -16,7 +16,7 @@ public partial class FrmMain : Form
 	
 	// 設定ファイルのパスをreadonlyで指定（readonlyだとそれぞれのフォームで指定要）
 	public readonly string confPath = @".\config\TLMForwarder.ini";	// 設定用ファイル
-	private readonly string version = "2.4.2";						// バージョン
+	private readonly string version = "2.4.3 Debug";						// バージョン
 	public FrmSettings frmSettings = new();							// FrmSettingsのインスタンス
 	private List<string[]>? sat_list = [];							// 文字配列リストとしてsat_listを作成
 	public static object? classInstance;							// DLLのクラスインスタンス
@@ -34,7 +34,6 @@ public partial class FrmMain : Form
 	private static FrmMain? instance;								// FrmMain自身のインスタンス
 	private TcpClient? client;										// Modem接続clientの作成
 	private NetworkStream? stream;									// Modemから流入するストリーム
-	
 
 	///********************************************
 	/// メインフォームの初期設定　（コンストラクタ）
@@ -260,7 +259,21 @@ public partial class FrmMain : Form
 	//************************************************************
 	private void BtnSettings_Click(object sender, EventArgs e)
 	{
+		// 設定変更前のTLEソースを変数に代入
+		string previousPath = frmSettings.TxtTLE_Source.Text;
+
+		// Settingsフォームを起ち上げる
 		frmSettings.ShowDialog();
+
+		// もし設定値と設定終了後のTLEソースに違いがあれば
+		if (frmSettings.TxtTLE_Source.Text != previousPath)
+		{
+			// Settingsの設定を最終的に保存
+			frmSettings.SaveDatatoFile();			
+			
+			// アプリケーションをりすたーとする
+			Application.Restart();
+		}
 	}
 
 	//************************************************************
@@ -604,9 +617,10 @@ public partial class FrmMain : Form
 		// KISS Dataの受信用バッファを定義
 		byte[] recvBuff = new byte[25600];
 
+		// サブスレッドの停止フラッグを偽にする（つまりサブスレッドを稼働に設定）
 		clientStop = false;
 
-		/* 受信が無くても1秒に一度ループする　*/
+		// 受信が無くても1秒に一度ループする
 		if ( client != null)	
 		{
 			client.ReceiveTimeout = 1000;
@@ -1137,5 +1151,3 @@ public partial class FrmMain : Form
 		}
 	}
 }
-
-

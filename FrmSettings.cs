@@ -75,6 +75,8 @@
 		//*************************************************
 		private void SelectLogDir()
 		{
+			string previousPath = TxtLogDir.Text;
+
 			FolderBrowserDialog logFolderDialog = new()
 			{
 				Description = "Select the folder for log files."
