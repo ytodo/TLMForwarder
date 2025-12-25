@@ -54,7 +54,7 @@ namespace TLMForwarder
 		}
 
 		//
-		//	SatNOGSのリンクをクリックした時の処理
+		//	SatNOGSのリンクをクリックした時の処理(個別衛星のページを開いてフォームを閉じる)
 		//
 		private void LblSatNOGS_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
@@ -71,6 +71,8 @@ namespace TLMForwarder
 
 				//リンク先に移動したフラグを立てる
 				LblSatNOGS.LinkVisited = true;
+
+				this.Close();
 			}
 		}
 	}

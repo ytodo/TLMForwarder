@@ -16,7 +16,7 @@ public partial class FrmMain : Form
 	
 	// 設定ファイルのパスをreadonlyで指定（readonlyだとそれぞれのフォームで指定要）
 	public readonly string confPath = @".\config\TLMForwarder.ini";	// 設定用ファイル
-	private readonly string version = "2.4.3 Debug";						// バージョン
+	private readonly string version = "2.5.1";						// バージョン
 	public FrmSettings frmSettings = new();							// FrmSettingsのインスタンス
 	private List<string[]>? sat_list = [];							// 文字配列リストとしてsat_listを作成
 	public static object? classInstance;							// DLLのクラスインスタンス
@@ -27,7 +27,7 @@ public partial class FrmMain : Form
 	private string? digPath;										// ログファイルのパス
 	private string? kssPath;										// ログファイルのパス
 	private string? hexPath;										// ログファイルのパス
-	public readonly byte[]? tmpBuff;								// SubThreadからMainThreadへの受け渡しデータ
+	//public readonly byte[]? tmpBuff;								// SubThreadからMainThreadへの受け渡しデータ
 	public int forwardNum = 0;										// 転送(送信)した回数
 	public int apliedNum = 0;										// 受け付けられたテレメトリー数
 	private static System.Timers.Timer? aTimer;						// Timerの生成
@@ -105,8 +105,6 @@ public partial class FrmMain : Form
 		// TimeZoneボタンの初期設定
 		BtnTimeZoneInit();
 
-		// KISS Client用サブスレッドの起動
-		StartKissThread();
 	}
 
 	///********************************************
@@ -163,7 +161,7 @@ public partial class FrmMain : Form
 
 	//************************************************************
 	// Date,Timeの表示フォーマットとラジオボタンによるロケールの切替
-	//************************************************************ <summary>
+	//************************************************************
 
 	// Timerのセット
 	public void TimerInit()
@@ -418,20 +416,39 @@ public partial class FrmMain : Form
 		// サテライトを選択するたびに今までの動作をリフレッシュする
 		if (CmbSatName.Text != null && kssPath != null && hexPath != null)
 		{
+			if (client != null)
+			{
+    			client.Close();
+				client.Dispose();
+			}
+
 			// サブスレッドを一旦クローズする
-			clientStop = true;  													// テスト
+			clientStop = true;
 
 			// 前回使用ファイルの消去など（FileControl.cs)）
 			FileControl.ClosingProcess(kssPath, hexPath);
+
+			//
+			// フォームの現在座標を取得し次回起動時継承するためファイルに保存
+			//
+			int x = Location.X;
+			int y = Location.Y;
+			frmSettings.TxtWindow_x.Text = x.ToString();
+			frmSettings.TxtWindow_y.Text = y.ToString();
+
+			// Settingsの設定を最終的に保存する	
+			frmSettings.SaveDatatoFile();
+			Log.Information("Settings completely saved and RESTART.");
 		}
 
 		// 選択した衛星名を設定パネルの TxtLastUsed.text に反映させる
 		frmSettings.TxtLastUsed.Text = CmbSatName.Text;
 		Log.Information("Set satellite to " + CmbSatName.Text + ".");
 		
-		
+		// 衛星一覧が空だったらここからリターンする
 		if (sat_list == null) return;
 
+		// 衛星一覧が存在する時の処理
 		foreach (string[] line in sat_list)
 		{
 			if (line[0] == CmbSatName.Text + ':')
@@ -447,7 +464,7 @@ public partial class FrmMain : Form
 		apliedNum = 0;
 		LblFrameNum.Text = string.Empty;
 
-		/* 衛星名に即したログファイルを作成 (Filecontrol.cs) */
+		// 衛星名に即したログファイルを作成 (Filecontrol.cs)
 		(tlmPath, digPath, kssPath, hexPath) = FileControl.CreateAppLog(frmSettings, this);
 
 		// DLLのクラスインスタンスを作成
@@ -483,7 +500,7 @@ public partial class FrmMain : Form
 		}
 
 		// サテライト選択の度にKISSポートに接続し直す
-		StartKissThread();																	// テスト
+		StartKissThread();
 	}
 
 	//**************************************************
@@ -637,7 +654,7 @@ public partial class FrmMain : Form
 					// 実長さに沿った一時バッファを生成
 					byte[] tmpBuff = new byte[recvBytes];
 
-					// 受信データ（1024バイト）を実長さにカット
+					// 受信データを実長さにカット
 					Array.Copy(recvBuff, tmpBuff, recvBytes);
 
 					// メインスレッドにデータ（実長さ）を渡す
@@ -645,7 +662,8 @@ public partial class FrmMain : Form
 				}
 				catch (Exception)
 				{
-/*// Debug
+
+/*	// for Test
 					string filePath = @"S:\Satellites_Data\SATLOG\test.kss";
 
 					byte[] tmpBuff;
@@ -657,14 +675,16 @@ public partial class FrmMain : Form
 					SetReceivedData(tmpBuff);
 // Debug end  */
 
-					// タイムアウトでループしても空回しする
-					continue;
 				}
 			}
 
 			// clientStop = true でループを抜けた時の処理
-			client.Close();
-			client.Dispose();
+			if (client != null)
+			{
+			    client.Close();
+			    //client = null;
+				client.Dispose();
+			}
 
 			// メッセージ受け渡し変数に代入
 			Log.Information("Closing KISS Client and Thread.");
@@ -698,55 +718,20 @@ public partial class FrmMain : Form
 				Log.Information("Error occurred while saving data");
 		}
 
-		// バースト受信が有効になっている時
-		if (ChkBurst.Checked == true) 
-		{
-			if (ChkForwarding.Checked == true)
-			{
-				// ファイルが存在するか確認
-				if (File.Exists(kssPath))
-				{
-					// ファイルからすべての行を読み込む
-					byte[] recvData = File.ReadAllBytes(kssPath);               // 設定ファイルからの行データを取得
-					//byte[] separator = [0xC0, 0x00];
-		
-		        	// recvDataをseparatorで区切って分割
-        			List<byte[]> chunks = SplitBinaryData(recvData);
-
-					if (chunks.Count > 0)
-					{
-						UpdateTextBox($"\r\n\r\n[FORWARD PROCESS]\r\n\r\n");
-
-			        	// 分割結果を確認
-        				for (int i = 0; i < chunks.Count; i++)
-		    	    	{
-        			    	Debug.WriteLine($"{i + 1}: {BitConverter.ToString(chunks[i])}");
-							Forwarding(chunks[i]);
-			        	}
-
-						// 1ファイルすべて転送終了したらバースト処理を終了する
-						UpdateCheckBox(ChkBurst, false);
-						UpdateCheckBox(ChkForwarding, false);
-						UpdateTextBox($"\r\nDone the FORWARD PROCESS.\r\n\r\n");
-					}
-				}
-			}
-			
-			// recvDataをスペース区切りの16進数テキストに変換
+        // バースト受信が有効になっている時 kiss データとして生保存
+        if (ChkBurst.Checked == true)
+        {
+			// recvDataをスペース区切りの16進数テキストに変換して表示
 			string hexString = string.Join(" ", data.Select(b => b.ToString("X2"))).ToLower() + " ";
+        	UpdateTextBox(hexString);
 
-			if (ChkBurst.Checked == true)
-				// Telemetry Tabに表示
-				UpdateTextBox(hexString);
-
-			// 受信をループさせる
-			//	return;
-		}
-		else
-		// 通常の１パケットごとに転送処理する時
-		{
-			Forwarding(recvData);
-		}
+            // 受信をループさせる
+            return;
+        }
+        else        // 通常の１パケットごとに転送処理する時
+        {
+            Forwarding(recvData);
+        }
 	}
 
 	// UIスレッドのChkBurstを変更する
@@ -830,6 +815,18 @@ public partial class FrmMain : Form
 			}
 			/////////////////////////////////////////////////////////////////
 
+			// Digipeaterデータ（交信ログ）の処理
+			if (!string.IsNullOrEmpty(logData))
+			{
+				
+				DisplayQSO(logData); //, columnName);
+			}
+			else
+			{
+				Log.Error("Receive DATA and/or LOG file is not exist.");
+			}
+
+			// Telemetryデータ（転送データ）の処理
 			if (!string.IsNullOrEmpty(telemetryString))
 			{
 				telemetryString = telemetryString.Trim();
@@ -923,17 +920,6 @@ public partial class FrmMain : Form
 					// Telemetry Tabに表示
 					UpdateTextBox(response);
 				}
-			}
-
-			// Digipeaterデータ（交信ログ）の処理
-			if (!string.IsNullOrEmpty(logData))
-			{
-				DisplayQSO(logData); //, columnName);
-			}
-			else
-			{
-				Log.Error("Receive DATA and/or LOG file is not exist.");
-				return;
 			}
 		}
 		return;
@@ -1097,7 +1083,7 @@ public partial class FrmMain : Form
 		int rowIndex = GrdDigipeater.RowCount - 1;                              // 何行目か算出（ヘッダー分を引く）
 
 		// 表示用データをスレッド間表示サブへ送る
-		string[] dispData = logData[1..^1].Split(",");
+		string[] dispData = logData[1..^1].Split(";");
 		string time = dt.ToString("HH:mm:ss");
 		UpdateGrid(dispData, rowIndex, time);
 	}
@@ -1111,6 +1097,7 @@ public partial class FrmMain : Form
 		}
 		else
 		{
+			// すべての提供データが有効な場合
 			if (data != null && row >= 0 && time != null && !TxtTelemetry.IsDisposed)
 			{
 				// 新しい行にデータを表示する
@@ -1122,8 +1109,22 @@ public partial class FrmMain : Form
 					data[2].Trim(),
 					data[3].Trim()
 				);
+				
+				// 初めての行表示において、どうしてもstyleの適用がされないための対策
+				if (row == 0)
+				{
+					// 一旦一行書いた上で削除し、書き直す
+					GrdDigipeater.Rows.RemoveAt(row);
+					GrdDigipeater.Rows.Insert(
+						row,
+						time,
+						data[0].Trim(),
+						data[1].Trim(),
+						data[2].Trim(),
+						data[3].Trim()
+					);
+				}
 
-				// データの内自局分を色分けする
 				DataGridViewCellStyle stringColor = new();
 					
 				// 送信元が自局の場合（自局送信のリピート受信）
@@ -1146,7 +1147,8 @@ public partial class FrmMain : Form
 				}
 
 				// 表示可能な行数を把握してその行が見える最終までスクロールする
-				GrdDigipeater.FirstDisplayedScrollingRowIndex = GrdDigipeater.Rows.GetLastRow(DataGridViewElementStates.Visible);
+				GrdDigipeater.FirstDisplayedScrollingRowIndex 
+					= GrdDigipeater.Rows.GetLastRow(DataGridViewElementStates.Visible);
 			}
 		}
 	}
